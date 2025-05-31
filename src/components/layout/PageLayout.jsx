@@ -1,38 +1,25 @@
-
-// === src/App.jsx ===
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import {Security, LoginCallback, SecureRoute} from '@okta/okta-react';
-import {OktaAuth} from '@okta/okta-auth-js';
-import oktaConfig from '../../oktaConfig';
+import { Routes, Route } from 'react-router-dom';
+import { useOktaAuth } from '@okta/okta-react';
+import { Navigate } from 'react-router-dom';
 
 import GroupManager from '../group/GroupManager';
 import EventManager from '../event/EventManager';
-import Login from '../login/Login';
+import LoginCallback from '@okta/okta-react/components/LoginCallback';
 
-const oktaAuth = new OktaAuth(oktaConfig);
+const ProtectedRoute = ({ children }) => {
+  const { authState } = useOktaAuth();
+  if (!authState || !authState.isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
 
-function PageLayout() {
-    const navigate = useNavigate();
+export default function PageLayout() {
   return (
-    
-        <Security oktaAuth={oktaAuth}
-          restoreOriginalUri={async (_oktaAuth, originalUri) => {
-             navigate(originalUri || '/', { replace: true });
-  }}
-        >
-            <h1 className="text-3xl font-bold mb-6">JUG Tours Admin</h1>
-            <Routes>
-                <Route path="/" element={<Navigate to="/groups" />} />
-                <Route path="/groups" element={<GroupManager />} />
-                <Route path="/events" element={<EventManager />} />
-                <Route path="/groups/:groupId/events" element={<EventManager />} />
-                <Route path="/login" element={<Login />} />
-            </Routes>
-        </Security>
-    
-  
+    <Routes>
+      <Route path="/groups/*" element={<ProtectedRoute><GroupManager /></ProtectedRoute>} />
+      <Route path="/events/*" element={<ProtectedRoute><EventManager /></ProtectedRoute>} />
+      <Route path="/login/callback" element={<LoginCallback />} />
+    </Routes>
   );
 }
-
-export default PageLayout;

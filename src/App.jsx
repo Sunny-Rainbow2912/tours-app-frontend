@@ -1,15 +1,17 @@
-
-// === src/App.jsx ===
-import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { Security } from '@okta/okta-react';
+import { oktaAuth } from './oktaAuth';
 import Navbar from './components/layout/Navbar';
 import PageLayout from './components/layout/PageLayout';
 
 function App() {
   return (
-    <div >
-      <Navbar />
-      <PageLayout />
-    </div>
+    <BrowserRouter>
+      <Security oktaAuth={oktaAuth}>
+        <Navbar />
+        <PageLayout />
+      </Security>
+    </BrowserRouter>
   );
 }
 
