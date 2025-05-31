@@ -5,6 +5,9 @@ import GroupManager from '../group/GroupManager';
 import EventManager from '../event/EventManager';
 import { LoginCallback } from '@okta/okta-react';
 
+import LoginRedirect from '../login/LoginRedirect';
+
+
 
 const ProtectedRoute = ({ children }) => {
   const { authState } = useOktaAuth();
@@ -17,6 +20,7 @@ const ProtectedRoute = ({ children }) => {
 export default function PageLayout() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/groups" />} />
       <Route path="/groups/*" element={
         <ProtectedRoute>
           <GroupManager />
@@ -27,7 +31,11 @@ export default function PageLayout() {
           <EventManager />
         </ProtectedRoute>
       } />
+      
+
+      <Route path="/login" element={<LoginRedirect />} />
       <Route path="/login/callback" element={<LoginCallback />} />
+
     </Routes>
   );
 }
