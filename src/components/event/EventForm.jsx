@@ -47,7 +47,7 @@ export default function EventForm() {
     const payload = {
       title: event.title,
       date: event.date,
-      group: { id: event.groupId }, // match backend format
+      group: { id: event.groupId },
     };
     id ? await updateEvent(id, payload) : await createEvent(payload);
     navigate('/events');
