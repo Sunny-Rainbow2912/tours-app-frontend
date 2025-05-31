@@ -1,20 +1,53 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getGroups, deleteGroup } from '../../api/groupService';
 
-// === src/components/group/GroupList.jsx ===
-import React from 'react';
+export default function GroupList() {
+  const [groups, setGroups] = useState([]);
 
-function GroupList({ groups, onEdit, onDelete, onSelect }) {
+  useEffect(() => {
+    loadGroups();
+  }, []);
+
+  const loadGroups = async () => {
+    const data = await getGroups();
+    setGroups(data);
+  };
+
+  const handleDelete = async (id) => {
+    await deleteGroup(id);
+    await loadGroups();
+  };
+
   return (
-    <ul>
-      {groups.map((group) => (
-        <li key={group.id}>
-          <strong>{group.name}</strong> — {group.city}, {group.country}
-          <button onClick={() => onSelect(group)}>Events</button>
-          <button onClick={() => onEdit(group)}>Edit</button>
-          <button onClick={() => onDelete(group.id)}>Delete</button>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2>Groups</h2>
+      <div style={{ marginBottom: '1rem' }}>
+        <Link to="/groups/new">+ Add Group</Link>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {groups.map(group => (
+            <tr key={group.id}>
+              <td>{group.name}</td>
+              <td>{group.city}</td>
+              <td>{group.country}</td>
+              <td>
+                <Link to={`/groups/${group.id}`}>Edit</Link>{' '}
+                <button onClick={() => handleDelete(group.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
-
-export default GroupList;

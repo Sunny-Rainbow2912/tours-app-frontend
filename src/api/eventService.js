@@ -25,3 +25,7 @@ export const updateEvent = async (id, event) => {
 export const deleteEvent = async (id) => {
   await axios.delete(`${API_BASE}/${id}`);
   };
+  export const getEventsByGroup = async (groupId) => {
+  const response = await axios.get(`/api/groups/${groupId}/events`);
+  return response.data;
+};

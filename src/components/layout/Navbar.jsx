@@ -1,24 +1,36 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-function Navbar (){
-    const isLoggedIn = useState(false);
-  
-    function logout(){
-        console.log("logout");
-    }
-    
-    return (
-        <div>
-            <Link to="/groups">
-                Groups
-            </Link>
-            <Link to="/events">
-                Events
-            </Link>
-            {isLoggedIn? <button onClick={logout}>Logout</button> : <Link to="/login">Login</Link>}
-          
-        </div>
-    )
-}
+import { useOktaAuth } from '@okta/okta-react';
+import { useEffect, useState } from 'react';
 
-export default Navbar;
+export default function Navbar() {
+  const { oktaAuth, authState } = useOktaAuth();
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    if (authState?.isAuthenticated) {
+      oktaAuth.getUser().then(setUserInfo);
+    } else {
+      setUserInfo(null);
+    }
+  }, [authState, oktaAuth]);
+
+  const login = async () => oktaAuth.signInWithRedirect();
+  const logout = async () => oktaAuth.signOut();
+
+  return (
+    <nav className="navbar">
+      <div className="container">
+        <h1 className="logo">JUG Tours</h1>
+        <div className="auth-section">
+          {authState?.isAuthenticated ? (
+            <>
+              <span>Welcome, {userInfo?.name}</span>
+              <button onClick={logout}>Logout</button>
+            </>
+          ) : (
+            <button onClick={login}>Login</button>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
